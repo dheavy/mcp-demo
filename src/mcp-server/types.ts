@@ -1,4 +1,3 @@
-// MCP Type Definitions
 export interface MCPTool {
   name: string;
   description: string;
