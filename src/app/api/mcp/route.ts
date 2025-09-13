@@ -3,6 +3,7 @@ import { config } from '@/mcp-server/server';
 import { getAllTools, executeTool, getToolCount } from '@/mcp-server/tools';
 import { getAllResources, getResourceCount } from '@/mcp-server/resources';
 import { getResourceContent } from '@/mcp-server/resources/content';
+import { requireAuth, canUseTool, canAccessResource } from '@/lib/middleware';
 
 export async function GET() {
   try {
@@ -25,18 +26,37 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check authentication.
+    const authResult = requireAuth(request);
+    if ('error' in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: 401 });
+    }
+
+    const user = authResult.user;
     const body = await request.json();
     const { method, params } = body;
 
     switch (method) {
       case 'tools/list':
+        // Filter tools based on user permissions.
+        const allTools = getAllTools();
+        const allowedTools = allTools.filter(tool =>
+          canUseTool(user, tool.name)
+        );
+
         return NextResponse.json({
-          tools: getAllTools(),
+          tools: allowedTools,
         });
 
       case 'resources/list':
+        // Filter resources based on user permissions.
+        const allResources = getAllResources();
+        const allowedResources = allResources.filter(resource =>
+          canAccessResource(user, resource.uri)
+        );
+
         return NextResponse.json({
-          resources: getAllResources(),
+          resources: allowedResources,
         });
 
       case 'resources/read':
@@ -44,6 +64,14 @@ export async function POST(request: NextRequest) {
           return NextResponse.json(
             { error: 'Resource URI is required' },
             { status: 400 }
+          );
+        }
+
+        // Check resource access permission.
+        if (!canAccessResource(user, params.uri)) {
+          return NextResponse.json(
+            { error: 'Access denied to this resource' },
+            { status: 403 }
           );
         }
 
@@ -70,6 +98,14 @@ export async function POST(request: NextRequest) {
           return NextResponse.json(
             { error: 'Tool name is required' },
             { status: 400 }
+          );
+        }
+
+        // Check tool access permission.
+        if (!canUseTool(user, params.name)) {
+          return NextResponse.json(
+            { error: 'Access denied to this tool' },
+            { status: 403 }
           );
         }
 

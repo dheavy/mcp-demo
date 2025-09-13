@@ -3,6 +3,7 @@
  */
 import Database from 'better-sqlite3';
 import path from 'path';
+import { initializeAuthTables } from './auth';
 
 // Database file path
 const DB_PATH = path.join(process.cwd(), 'demo.db');
@@ -59,6 +60,9 @@ function initializeTables() {
   `);
 
   insertSampleData();
+
+  // Initialize authentication tables.
+  initializeAuthTables();
 }
 
 function insertSampleData() {

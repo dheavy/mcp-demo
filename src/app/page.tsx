@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { MCPTool } from '@/mcp-server/types';
+import { useAuth } from '@/contexts/AuthContext';
+import AuthForm from '@/components/AuthForm';
 
 interface MCPResponse {
   content: Array<{
@@ -20,6 +22,7 @@ interface MCPResource {
 }
 
 export default function Home() {
+  const { user, loading: authLoading, login, logout } = useAuth();
   const [tools, setTools] = useState<MCPTool[]>([]);
   const [resources, setResources] = useState<MCPResource[]>([]);
   const [selectedTool, setSelectedTool] = useState<string>('');
@@ -28,13 +31,16 @@ export default function Home() {
   const [result, setResult] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [serverStatus, setServerStatus] = useState<string>('');
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
 
   // Load available tools and resources on component mount.
   useEffect(() => {
-    loadTools();
-    loadResources();
-    checkServerStatus();
-  }, []);
+    if (user) {
+      loadTools();
+      loadResources();
+      checkServerStatus();
+    }
+  }, [user]);
 
   const checkServerStatus = async () => {
     try {
@@ -187,17 +193,62 @@ export default function Home() {
     }
   };
 
+  // Show loading state while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show authentication form if not logged in
+  if (!user) {
+    return (
+      <AuthForm
+        mode={authMode}
+        onSuccess={login}
+        onSwitchMode={() =>
+          setAuthMode(authMode === 'login' ? 'register' : 'login')
+        }
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 py-8">
         <header className="text-center max-w-4xl mx-auto mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-            AI Assistant Hub
-          </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300">
+          <div className="flex justify-between items-center mb-4">
+            <div></div>
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
+              AI Assistant Hub
+            </h1>
+            <div className="flex items-center space-x-4">
+              <div className="text-right">
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  Welcome,{' '}
+                  <span className="font-semibold">{user.username}</span>
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-500">
+                  Role: <span className="capitalize">{user.role}</span>
+                </p>
+              </div>
+              <button
+                onClick={logout}
+                className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-sm transition-colors"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+          <p className="text-lg text-gray-600 dark:text-gray-300 mb-4">
             MCP (Model Context Protocol) Demo Application
           </p>
-          <div className="mt-4 p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+          <div className="p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
             <p className="text-sm font-mono text-gray-700 dark:text-gray-300">
               {serverStatus}
             </p>
