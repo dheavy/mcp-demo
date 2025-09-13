@@ -56,6 +56,26 @@ export default function Home() {
     }
   };
 
+  const getToolArguments = (
+    toolName: string,
+    input: string
+  ): Record<string, any> => {
+    switch (toolName) {
+      case 'echo':
+        return { message: input };
+      case 'get_weather':
+        return { location: input };
+      case 'list_files':
+        return { directory: input || '.' };
+      case 'read_file':
+        return { filepath: input };
+      case 'get_time':
+        return {};
+      default:
+        return {};
+    }
+  };
+
   const executeTool = async () => {
     if (!selectedTool) return;
 
@@ -72,7 +92,7 @@ export default function Home() {
           method: 'tools/call',
           params: {
             name: selectedTool,
-            arguments: selectedTool === 'echo' ? { message: toolInput } : {},
+            arguments: getToolArguments(selectedTool, toolInput),
           },
         }),
       });
@@ -129,7 +149,11 @@ export default function Home() {
                         ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                         : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
-                    onClick={() => setSelectedTool(tool.name)}
+                    onClick={() => {
+                      setSelectedTool(tool.name);
+                      setToolInput('');
+                      setResult('');
+                    }}
                   >
                     <h3 className="font-medium text-gray-900 dark:text-white">
                       {tool.name}
@@ -164,6 +188,36 @@ export default function Home() {
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                       />
                     )}
+
+                    {selectedTool === 'get_weather' && (
+                      <input
+                        type="text"
+                        value={toolInput}
+                        onChange={e => setToolInput(e.target.value)}
+                        placeholder="Enter city name (e.g., London, New York, Tokyo)..."
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                      />
+                    )}
+
+                    {selectedTool === 'list_files' && (
+                      <input
+                        type="text"
+                        value={toolInput}
+                        onChange={e => setToolInput(e.target.value)}
+                        placeholder="Enter directory path (e.g., src, .) or leave empty for current directory..."
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                      />
+                    )}
+
+                    {selectedTool === 'read_file' && (
+                      <input
+                        type="text"
+                        value={toolInput}
+                        onChange={e => setToolInput(e.target.value)}
+                        placeholder="Enter file path (e.g., package.json, src/app/page.tsx)..."
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                      />
+                    )}
                   </div>
 
                   <button
@@ -178,12 +232,12 @@ export default function Home() {
 
               {result && (
                 <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
-                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Result:
                   </h3>
-                  <p className="text-sm font-mono text-gray-900 dark:text-white">
+                  <pre className="text-sm font-mono text-gray-900 dark:text-white whitespace-pre-wrap overflow-x-auto">
                     {result}
-                  </p>
+                  </pre>
                 </div>
               )}
             </div>

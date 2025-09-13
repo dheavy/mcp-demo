@@ -6,7 +6,12 @@ import {
   ListResourcesRequestSchema,
   ReadResourceRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
-import { MCPToolResult, MCPServerConfig } from './types.js';
+import { MCPServerConfig } from './types.js';
+import { getAllTools, executeTool } from './tools/index';
+
+// Import tools to register them
+import './tools/weather';
+import './tools/filesystem';
 
 const config: MCPServerConfig = {
   name: 'ai-assistant-hub',
@@ -32,7 +37,7 @@ const server = new Server(
 // List available tools.
 server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
-    tools: config.tools,
+    tools: getAllTools(),
   };
 });
 
@@ -66,8 +71,7 @@ server.setRequestHandler(CallToolRequestSchema, async request => {
   const { name, arguments: args } = request.params;
 
   try {
-    // We route to the appropriate tool handler.
-    const result = await handleToolCall(name, args || {});
+    const result = await executeTool(name, args || {});
     return {
       content: result.content,
       isError: result.isError || false,
@@ -87,60 +91,47 @@ server.setRequestHandler(CallToolRequestSchema, async request => {
   }
 });
 
-async function handleToolCall(
-  name: string,
-  args: Record<string, any>
-): Promise<MCPToolResult> {
-  switch (name) {
-    case 'echo':
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Echo: ${args.message || 'Hello from MCP!'}`,
-          },
-        ],
-      };
+// Register basic tools.
+import { registerTool } from './tools/index';
 
-    case 'get_time':
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Current time: ${new Date().toISOString()}`,
-          },
-        ],
-      };
-
-    default:
-      throw new Error(`Unknown tool: ${name}`);
-  }
-}
-
-// Register tools
-config.tools.push(
-  {
-    name: 'echo',
-    description: 'Echo back a message',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        message: {
-          type: 'string',
-          description: 'The message to echo back',
-        },
+registerTool({
+  name: 'echo',
+  description: 'Echo back a message',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      message: {
+        type: 'string',
+        description: 'The message to echo back',
       },
     },
   },
-  {
-    name: 'get_time',
-    description: 'Get the current time',
-    inputSchema: {
-      type: 'object',
-      properties: {},
-    },
-  }
-);
+  handler: async (args: Record<string, any>) => ({
+    content: [
+      {
+        type: 'text',
+        text: `Echo: ${args.message || 'Hello from MCP!'}`,
+      },
+    ],
+  }),
+});
+
+registerTool({
+  name: 'get_time',
+  description: 'Get the current time',
+  inputSchema: {
+    type: 'object',
+    properties: {},
+  },
+  handler: async () => ({
+    content: [
+      {
+        type: 'text',
+        text: `Current time: ${new Date().toISOString()}`,
+      },
+    ],
+  }),
+});
 
 async function startServer() {
   const transport = new StdioServerTransport();

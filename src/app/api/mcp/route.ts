@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { config } from '@/mcp-server/server';
+import { getAllTools, executeTool, getToolCount } from '@/mcp-server/tools';
 
 export async function GET() {
   try {
@@ -8,7 +9,7 @@ export async function GET() {
       config: {
         name: config.name,
         version: config.version,
-        toolsCount: config.tools.length,
+        toolsCount: getToolCount(),
         resourcesCount: config.resources.length,
       },
     });
@@ -28,7 +29,7 @@ export async function POST(request: NextRequest) {
     switch (method) {
       case 'tools/list':
         return NextResponse.json({
-          tools: config.tools,
+          tools: getAllTools(),
         });
 
       case 'resources/list':
@@ -44,11 +45,7 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        // Simulate tool execution
-        const result = await simulateToolCall(
-          params.name,
-          params.arguments || {}
-        );
+        const result = await executeTool(params.name, params.arguments || {});
         return NextResponse.json({
           content: result.content,
           isError: result.isError || false,
@@ -65,41 +62,5 @@ export async function POST(request: NextRequest) {
       { error: 'Failed to process MCP request' },
       { status: 500 }
     );
-  }
-}
-
-// Simulate tool execution (we'll replace this with real tool handlers later)
-async function simulateToolCall(name: string, args: Record<string, any>) {
-  switch (name) {
-    case 'echo':
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Echo: ${args.message || 'Hello from MCP!'}`,
-          },
-        ],
-      };
-
-    case 'get_time':
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Current time: ${new Date().toISOString()}`,
-          },
-        ],
-      };
-
-    default:
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Unknown tool: ${name}`,
-          },
-        ],
-        isError: true,
-      };
   }
 }
