@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { config } from '@/mcp-server/server';
 import { getAllTools, executeTool, getToolCount } from '@/mcp-server/tools';
+import { getAllResources, getResourceCount } from '@/mcp-server/resources';
+import { getResourceContent } from '@/mcp-server/resources/content';
 
 export async function GET() {
   try {
@@ -10,7 +12,7 @@ export async function GET() {
         name: config.name,
         version: config.version,
         toolsCount: getToolCount(),
-        resourcesCount: config.resources.length,
+        resourcesCount: getResourceCount(),
       },
     });
   } catch (error) {
@@ -34,8 +36,34 @@ export async function POST(request: NextRequest) {
 
       case 'resources/list':
         return NextResponse.json({
-          resources: config.resources,
+          resources: getAllResources(),
         });
+
+      case 'resources/read':
+        if (!params || !params.uri) {
+          return NextResponse.json(
+            { error: 'Resource URI is required' },
+            { status: 400 }
+          );
+        }
+
+        try {
+          const content = getResourceContent(params.uri);
+          return NextResponse.json({
+            contents: [
+              {
+                uri: params.uri,
+                mimeType: 'text/plain',
+                text: content,
+              },
+            ],
+          });
+        } catch (error) {
+          return NextResponse.json(
+            { error: `Resource not found: ${params.uri}` },
+            { status: 404 }
+          );
+        }
 
       case 'tools/call':
         if (!params || !params.name) {

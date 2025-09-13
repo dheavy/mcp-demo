@@ -8,10 +8,17 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import { MCPServerConfig } from './types.js';
 import { getAllTools, executeTool } from './tools/index';
+import { getAllResources, initializeResources } from './resources/index';
+import { getResourceContent } from './resources/content';
 
-// Import tools to register them
+// Import tools to register them.
 import './tools/weather';
 import './tools/filesystem';
+import './tools/search';
+import './tools/database';
+
+// Initialize resources
+initializeResources();
 
 const config: MCPServerConfig = {
   name: 'ai-assistant-hub',
@@ -44,23 +51,25 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 // List available resources.
 server.setRequestHandler(ListResourcesRequestSchema, async () => {
   return {
-    resources: config.resources,
+    resources: getAllResources(),
   };
 });
 
 // Read a resource.
 server.setRequestHandler(ReadResourceRequestSchema, async request => {
-  const resource = config.resources.find(r => r.uri === request.params.uri);
+  const resource = getAllResources().find(r => r.uri === request.params.uri);
   if (!resource) {
     throw new Error(`Resource not found: ${request.params.uri}`);
   }
+
+  const content = getResourceContent(request.params.uri);
 
   return {
     contents: [
       {
         uri: resource.uri,
         mimeType: resource.mimeType || 'text/plain',
-        text: `Resource content for ${resource.name}`,
+        text: content,
       },
     ],
   };
