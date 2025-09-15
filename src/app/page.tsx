@@ -34,6 +34,15 @@ export default function Home() {
   const [serverStatus, setServerStatus] = useState<string>('');
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [activeTab, setActiveTab] = useState<'http' | 'websocket'>('http');
+  const [isVercel, setIsVercel] = useState(false);
+
+  // Check if running on Vercel
+  useEffect(() => {
+    setIsVercel(
+      process.env.NODE_ENV === 'production' &&
+        window.location.hostname.includes('vercel.app')
+    );
+  }, []);
 
   // Load available tools and resources on component mount.
   useEffect(() => {
@@ -274,16 +283,27 @@ export default function Home() {
                 </button>
                 <button
                   onClick={() => setActiveTab('websocket')}
+                  disabled={isVercel}
                   className={`py-2 px-1 border-b-2 font-medium text-sm ${
                     activeTab === 'websocket'
                       ? 'border-blue-500 text-blue-600 dark:text-blue-400'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-                  }`}
+                  } ${isVercel ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                  Real-time WebSocket Client
+                  Real-time WebSocket Client{' '}
+                  {isVercel && '(Not available on Vercel)'}
                 </button>
               </nav>
             </div>
+            {isVercel && (
+              <div className="mt-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
+                <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                  <strong>Note:</strong> WebSocket functionality is not
+                  available on Vercel. Use the HTTP MCP Client for full
+                  functionality.
+                </p>
+              </div>
+            )}
           </div>
 
           {activeTab === 'websocket' ? (
