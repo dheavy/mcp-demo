@@ -257,179 +257,179 @@ export default function Home() {
 
         <main className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-6">
-            {/* Tool Selection */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                Available Tools
-              </h2>
+              {/* Tool Selection */}
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                  Available Tools
+                </h2>
 
-              <div className="space-y-3">
-                {tools.map(tool => (
-                  <div
-                    key={tool.name}
-                    className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                      selectedTool === tool.name
-                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                    }`}
-                    onClick={() => {
-                      setSelectedTool(tool.name);
-                      setToolInput('');
-                      setResult('');
-                    }}
-                  >
-                    <h3 className="font-medium text-gray-900 dark:text-white">
-                      {tool.name}
-                    </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {tool.description}
-                    </p>
-                  </div>
-                ))}
+                <div className="space-y-3">
+                  {tools.map(tool => (
+                    <div
+                      key={tool.name}
+                      className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                        selectedTool === tool.name
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                          : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                      }`}
+                      onClick={() => {
+                        setSelectedTool(tool.name);
+                        setToolInput('');
+                        setResult('');
+                      }}
+                    >
+                      <h3 className="font-medium text-gray-900 dark:text-white">
+                        {tool.name}
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {tool.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Tool Execution */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                Execute Tool
-              </h2>
+              {/* Tool Execution */}
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                  Execute Tool
+                </h2>
 
-              {selectedTool && (
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Selected Tool: {selectedTool}
-                    </label>
+                {selectedTool && (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Selected Tool: {selectedTool}
+                      </label>
 
-                    {selectedTool === 'echo' && (
-                      <input
-                        type="text"
-                        value={toolInput}
-                        onChange={e => setToolInput(e.target.value)}
-                        placeholder="Enter message to echo..."
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                      />
-                    )}
+                      {selectedTool === 'echo' && (
+                        <input
+                          type="text"
+                          value={toolInput}
+                          onChange={e => setToolInput(e.target.value)}
+                          placeholder="Enter message to echo..."
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                        />
+                      )}
 
-                    {selectedTool === 'get_weather' && (
-                      <input
-                        type="text"
-                        value={toolInput}
-                        onChange={e => setToolInput(e.target.value)}
-                        placeholder="Enter city name (e.g., London, New York, Tokyo)..."
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                      />
-                    )}
+                      {selectedTool === 'get_weather' && (
+                        <input
+                          type="text"
+                          value={toolInput}
+                          onChange={e => setToolInput(e.target.value)}
+                          placeholder="Enter city name (e.g., London, New York, Tokyo)..."
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                        />
+                      )}
 
-                    {selectedTool === 'list_files' && (
-                      <input
-                        type="text"
-                        value={toolInput}
-                        onChange={e => setToolInput(e.target.value)}
-                        placeholder="Enter directory path (e.g., src, .) or leave empty for current directory..."
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                      />
-                    )}
+                      {selectedTool === 'list_files' && (
+                        <input
+                          type="text"
+                          value={toolInput}
+                          onChange={e => setToolInput(e.target.value)}
+                          placeholder="Enter directory path (e.g., src, .) or leave empty for current directory..."
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                        />
+                      )}
 
-                    {selectedTool === 'read_file' && (
-                      <input
-                        type="text"
-                        value={toolInput}
-                        onChange={e => setToolInput(e.target.value)}
-                        placeholder="Enter file path (e.g., package.json, src/app/page.tsx)..."
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                      />
-                    )}
+                      {selectedTool === 'read_file' && (
+                        <input
+                          type="text"
+                          value={toolInput}
+                          onChange={e => setToolInput(e.target.value)}
+                          placeholder="Enter file path (e.g., package.json, src/app/page.tsx)..."
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                        />
+                      )}
 
-                    {selectedTool === 'web_search' && (
-                      <input
-                        type="text"
-                        value={toolInput}
-                        onChange={e => setToolInput(e.target.value)}
-                        placeholder="Enter search query (e.g., MCP model context protocol, Next.js TypeScript)..."
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                      />
-                    )}
+                      {selectedTool === 'web_search' && (
+                        <input
+                          type="text"
+                          value={toolInput}
+                          onChange={e => setToolInput(e.target.value)}
+                          placeholder="Enter search query (e.g., MCP model context protocol, Next.js TypeScript)..."
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                        />
+                      )}
 
-                    {selectedTool === 'db_query' && (
-                      <textarea
-                        value={toolInput}
-                        onChange={e => setToolInput(e.target.value)}
-                        placeholder="Enter SQL SELECT query (e.g., SELECT * FROM users, SELECT * FROM products WHERE stock < 20)..."
-                        rows={3}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white resize-vertical"
-                      />
-                    )}
+                      {selectedTool === 'db_query' && (
+                        <textarea
+                          value={toolInput}
+                          onChange={e => setToolInput(e.target.value)}
+                          placeholder="Enter SQL SELECT query (e.g., SELECT * FROM users, SELECT * FROM products WHERE stock < 20)..."
+                          rows={3}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white resize-vertical"
+                        />
+                      )}
+                    </div>
+
+                    <button
+                      onClick={executeTool}
+                      disabled={loading}
+                      className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-md transition-colors"
+                    >
+                      {loading ? 'Executing...' : 'Execute Tool'}
+                    </button>
                   </div>
+                )}
 
+                {result && (
+                  <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Result:
+                    </h3>
+                    <pre className="text-sm font-mono text-gray-900 dark:text-white whitespace-pre-wrap overflow-x-auto">
+                      {result}
+                    </pre>
+                  </div>
+                )}
+              </div>
+
+              {/* Resources Section */}
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                  Available Resources
+                </h2>
+
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {resources.map(resource => (
+                    <div
+                      key={resource.uri}
+                      className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                        selectedResource === resource.uri
+                          ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
+                          : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                      }`}
+                      onClick={() => {
+                        setSelectedResource(resource.uri);
+                        setSelectedTool('');
+                        setToolInput('');
+                        setResult('');
+                      }}
+                    >
+                      <h3 className="font-medium text-gray-900 dark:text-white text-sm">
+                        {resource.name}
+                      </h3>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                        {resource.description}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-1 font-mono">
+                        {resource.uri}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                {selectedResource && (
                   <button
-                    onClick={executeTool}
+                    onClick={() => readResource(selectedResource)}
                     disabled={loading}
-                    className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-md transition-colors"
+                    className="w-full mt-4 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-md transition-colors"
                   >
-                    {loading ? 'Executing...' : 'Execute Tool'}
+                    {loading ? 'Loading...' : 'Read Resource'}
                   </button>
-                </div>
-              )}
-
-              {result && (
-                <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
-                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Result:
-                  </h3>
-                  <pre className="text-sm font-mono text-gray-900 dark:text-white whitespace-pre-wrap overflow-x-auto">
-                    {result}
-                  </pre>
-                </div>
-              )}
-            </div>
-
-            {/* Resources Section */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                Available Resources
-              </h2>
-
-              <div className="space-y-3 max-h-96 overflow-y-auto">
-                {resources.map(resource => (
-                  <div
-                    key={resource.uri}
-                    className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                      selectedResource === resource.uri
-                        ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                    }`}
-                    onClick={() => {
-                      setSelectedResource(resource.uri);
-                      setSelectedTool('');
-                      setToolInput('');
-                      setResult('');
-                    }}
-                  >
-                    <h3 className="font-medium text-gray-900 dark:text-white text-sm">
-                      {resource.name}
-                    </h3>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                      {resource.description}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1 font-mono">
-                      {resource.uri}
-                    </p>
-                  </div>
-                ))}
+                )}
               </div>
-
-              {selectedResource && (
-                <button
-                  onClick={() => readResource(selectedResource)}
-                  disabled={loading}
-                  className="w-full mt-4 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-md transition-colors"
-                >
-                  {loading ? 'Loading...' : 'Read Resource'}
-                </button>
-              )}
-            </div>
           </div>
 
           {/* Learning Section */}
@@ -460,6 +460,7 @@ export default function Home() {
                 <li>Create a modern web interface for MCP interactions.</li>
                 <li>Implement database operations with SQLite.</li>
                 <li>Build web search capabilities with mock results.</li>
+                <li>Add authentication and authorization with JWT tokens.</li>
               </ul>
             </div>
           </div>
