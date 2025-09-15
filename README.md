@@ -2,7 +2,7 @@
 
 A comprehensive demonstration of the **Model Context Protocol (MCP)** implemented in Next.js with TypeScript, featuring both HTTP and real-time WebSocket communication, authentication, and a modern web interface.
 
-## 🚀 Features
+## Features
 
 ### Core MCP implementation
 
@@ -48,7 +48,7 @@ A comprehensive demonstration of the **Model Context Protocol (MCP)** implemente
 - **WebSocket**: ws library
 - **MCP SDK**: @modelcontextprotocol/sdk
 
-## 📦 Installation
+## Installation
 
 1. **Clone the repository**:
 
@@ -153,7 +153,7 @@ src/
 2. Implement content provider in `src/mcp-server/resources/content.ts`
 3. Resources will be available in both communication modes
 
-## 🔒 Security features
+## Security features
 
 - **Input validation**: All tool inputs are validated
 - **Path security**: Filesystem operations are restricted to project directory
@@ -180,7 +180,7 @@ src/
 - `ws://localhost:3000/ws/mcp` - WebSocket MCP connection
 - `GET /api/ws/stats` - WebSocket connection statistics
 
-## 🚀 Deployment
+## Deployment
 
 ### Production build
 
@@ -208,7 +208,7 @@ This demo covers:
 - **Security best practices**: Input validation and access control
 - **Modern React patterns**: Hooks, contexts, and TypeScript
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -216,11 +216,11 @@ This demo covers:
 4. Add tests if applicable
 5. Submit a pull request
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - [Model Context Protocol](https://modelcontextprotocol.io/) for the MCP specification
 - [Next.js](https://nextjs.org/) for the excellent React framework
