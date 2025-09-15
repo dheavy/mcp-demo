@@ -1,36 +1,227 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Assistant Hub - MCP Demo
 
-## Getting Started
+A comprehensive demonstration of the **Model Context Protocol (MCP)** implemented in Next.js with TypeScript, featuring both HTTP and real-time WebSocket communication, authentication, and a modern web interface.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### Core MCP implementation
+
+- **9 MCP tools**: Echo, time, weather, filesystem operations, web search, database queries
+- **7 MCP resources**: Documentation, API specs, configuration files
+- **Full MCP protocol support**: Tools, resources, and proper error handling
+- **TypeScript integration**: Complete type safety throughout
+
+### Dual communication modes
+
+- **HTTP MCP client**: Traditional request/response pattern
+- **Real-time WebSocket client**: Live communication with instant updates
+- **Tab-based interface**: Easy switching between communication modes
+
+### Authentication & security
+
+- **JWT-based authentication**: Secure user sessions
+- **Role-based access control**: Admin and user roles
+- **HTTP-only cookies**: Secure token storage
+- **Protected routes**: Authentication middleware
+
+### Real-time features
+
+- **Live tool execution**: Real-time status tracking
+- **Instant resource access**: Immediate resource reading
+- **Connection monitoring**: WebSocket connection status
+- **Automatic reconnection**: Resilient connection handling
+- **Execution history**: Timestamped operation logs
+
+### Database & storage
+
+- **SQLite integration**: Local database with sample data
+- **Safe file operations**: Restricted filesystem access
+- **Mock external APIs**: Weather and web search services
+
+## 🛠️ Tech stack
+
+- **Framework**: Next.js 15.5.3 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Database**: SQLite with better-sqlite3
+- **Authentication**: JWT with bcryptjs
+- **WebSocket**: ws library
+- **MCP SDK**: @modelcontextprotocol/sdk
+
+## 📦 Installation
+
+1. **Clone the repository**:
+
+   ```bash
+   git clone <repository-url>
+   cd mcp-demo
+   ```
+
+2. **Install dependencies**:
+
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server**:
+
+   ```bash
+   npm run dev
+   ```
+
+4. **Open your browser**:
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+## 🎯 Usage
+
+### Getting started
+
+1. **Register/Login**: Create an account or use existing credentials
+2. **Choose interface**: Switch between HTTP and WebSocket clients
+3. **Execute tools**: Try different MCP tools with real-time feedback
+4. **Read resources**: Access documentation and configuration files
+
+### Available tools
+
+- **echo**: Echo back messages
+- **get_time**: Get current timestamp
+- **get_weather**: Mock weather information
+- **list_files**: Browse project files safely
+- **read_file**: Read file contents with size limits
+- **web_search**: Mock web search results
+- **db_query**: Execute SQL SELECT queries
+- **db_schema**: View database schema
+- **db_samples**: Get sample database queries
+
+### Available resources
+
+- **MCP overview**: Introduction to Model Context Protocol
+- **Tool development guide**: How to create MCP tools
+- **Best practices**: Security and performance guidelines
+- **API documentation**: Weather and database endpoints
+- **Configuration**: Server settings and tool registry
+
+## 🔧 Development
+
+### Project structure
+
+```
+src/
+├── app/                    # Next.js App Router
+│   ├── api/               # API routes
+│   │   ├── auth/          # Authentication endpoints
+│   │   ├── mcp/           # MCP HTTP endpoints
+│   │   └── ws/            # WebSocket stats
+│   ├── layout.tsx         # Root layout with auth provider
+│   └── page.tsx           # Main application page
+├── components/            # React components
+│   ├── AuthForm.tsx       # Login/register forms
+│   └── RealtimeMCPClient.tsx # WebSocket client
+├── contexts/              # React contexts
+│   └── AuthContext.tsx    # Authentication state
+├── hooks/                 # Custom React hooks
+│   └── useWebSocket.ts    # WebSocket connection hook
+├── lib/                   # Utility libraries
+│   ├── auth.ts            # Authentication utilities
+│   ├── database.ts        # Database setup
+│   ├── middleware.ts      # Route protection
+│   └── websocket-server.ts # WebSocket server
+└── mcp-server/            # MCP implementation
+    ├── tools/             # MCP tools
+    ├── resources/         # MCP resources
+    ├── server.ts          # MCP server
+    └── types.ts           # TypeScript definitions
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Key files
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **`server.ts`**: Custom Next.js server with WebSocket support
+- **`src/lib/websocket-server.ts`**: WebSocket server implementation
+- **`src/hooks/useWebSocket.ts`**: React WebSocket hook
+- **`src/mcp-server/`**: Complete MCP server implementation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Adding new tools
 
-## Learn More
+1. Create a new tool file in `src/mcp-server/tools/`
+2. Implement the tool with proper input validation
+3. Register the tool in the tools index
+4. The tool will automatically appear in both HTTP and WebSocket clients
 
-To learn more about Next.js, take a look at the following resources:
+### Adding new resources
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Add resource definition in `src/mcp-server/resources/index.ts`
+2. Implement content provider in `src/mcp-server/resources/content.ts`
+3. Resources will be available in both communication modes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🔒 Security features
 
-## Deploy on Vercel
+- **Input validation**: All tool inputs are validated
+- **Path security**: Filesystem operations are restricted to project directory
+- **SQL injection protection**: Database queries are limited to SELECT statements
+- **Authentication required**: All MCP operations require valid authentication
+- **Role-based access**: Different permissions for admin and user roles
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🌐 API endpoints
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Authentication
+
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User login
+- `POST /api/auth/logout` - User logout
+- `GET /api/auth/me` - Get current user
+
+### MCP HTTP
+
+- `GET /api/mcp` - Server status
+- `POST /api/mcp` - MCP method calls (tools/list, resources/list, etc.)
+
+### WebSocket
+
+- `ws://localhost:3000/ws/mcp` - WebSocket MCP connection
+- `GET /api/ws/stats` - WebSocket connection statistics
+
+## 🚀 Deployment
+
+### Production build
+
+```bash
+npm run build
+npm start
+```
+
+### Environment variables
+
+- `JWT_SECRET`: Secret key for JWT tokens (default: development key)
+- `PORT`: Server port (default: 3000)
+- `NODE_ENV`: Environment mode
+
+## 📚 Learning resources
+
+This demo covers:
+
+- **MCP protocol**: Complete implementation of Model Context Protocol
+- **Tool development**: Creating and registering MCP tools
+- **Resource management**: Handling MCP resources and content
+- **Authentication**: JWT-based auth with role-based access
+- **WebSocket integration**: Real-time communication patterns
+- **Database operations**: SQLite integration with MCP
+- **Security best practices**: Input validation and access control
+- **Modern React patterns**: Hooks, contexts, and TypeScript
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🙏 Acknowledgments
+
+- [Model Context Protocol](https://modelcontextprotocol.io/) for the MCP specification
+- [Next.js](https://nextjs.org/) for the excellent React framework
+- [Tailwind CSS](https://tailwindcss.com/) for the utility-first CSS framework
