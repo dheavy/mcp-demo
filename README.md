@@ -182,12 +182,42 @@ src/
 
 ## Deployment
 
+### Local development
+
+```bash
+# Standard Next.js development (Vercel-compatible)
+npm run dev
+
+# Full development with WebSocket support
+npm run dev:full
+```
+
 ### Production build
 
 ```bash
 npm run build
 npm start
 ```
+
+### Vercel deployment
+
+1. **Connect to Vercel**:
+
+   ```bash
+   npx vercel
+   ```
+
+2. **Set environment variables** in Vercel dashboard:
+
+   - `JWT_SECRET`: Secret key for JWT tokens
+   - `NODE_ENV`: Set to `production`
+
+3. **Deploy**:
+   ```bash
+   npx vercel --prod
+   ```
+
+**⚠️ Important**: WebSocket functionality is not available on Vercel. The app automatically detects Vercel and disables WebSocket features. See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment information.
 
 ### Environment variables
 
