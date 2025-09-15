@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { MCPTool } from '@/mcp-server/types';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthForm from '@/components/AuthForm';
+import RealtimeMCPClient from '@/components/RealtimeMCPClient';
 
 interface MCPResponse {
   content: Array<{
@@ -32,6 +33,7 @@ export default function Home() {
   const [loading, setLoading] = useState<boolean>(false);
   const [serverStatus, setServerStatus] = useState<string>('');
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const [activeTab, setActiveTab] = useState<'http' | 'websocket'>('http');
 
   // Load available tools and resources on component mount.
   useEffect(() => {
@@ -256,7 +258,38 @@ export default function Home() {
         </header>
 
         <main className="max-w-6xl mx-auto">
-          <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-6">
+          {/* Tab Navigation */}
+          <div className="mb-6">
+            <div className="border-b border-gray-200 dark:border-gray-700">
+              <nav className="-mb-px flex space-x-8">
+                <button
+                  onClick={() => setActiveTab('http')}
+                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                    activeTab === 'http'
+                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                  }`}
+                >
+                  HTTP MCP Client
+                </button>
+                <button
+                  onClick={() => setActiveTab('websocket')}
+                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                    activeTab === 'websocket'
+                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                  }`}
+                >
+                  Real-time WebSocket Client
+                </button>
+              </nav>
+            </div>
+          </div>
+
+          {activeTab === 'websocket' ? (
+            <RealtimeMCPClient />
+          ) : (
+            <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-6">
               {/* Tool Selection */}
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
@@ -430,7 +463,8 @@ export default function Home() {
                   </button>
                 )}
               </div>
-          </div>
+            </div>
+          )}
 
           {/* Learning Section */}
           <div className="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
@@ -461,6 +495,10 @@ export default function Home() {
                 <li>Implement database operations with SQLite.</li>
                 <li>Build web search capabilities with mock results.</li>
                 <li>Add authentication and authorization with JWT tokens.</li>
+                <li>Implement real-time WebSocket communication for MCP.</li>
+                <li>
+                  Create both HTTP and WebSocket MCP clients for comparison.
+                </li>
               </ul>
             </div>
           </div>
