@@ -40,12 +40,6 @@ export function useWebSocket() {
     setState(prev => ({ ...prev, isConnecting: true, error: null }));
 
     try {
-      // Get token from cookies by making a request to the auth endpoint.
-      const response = await fetch('/api/auth/me');
-      if (!response.ok) {
-        throw new Error('Authentication failed');
-      }
-
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       const wsUrl = `${protocol}//${window.location.host}/ws/mcp`;
 

@@ -2,8 +2,59 @@ import { WebSocketServer, WebSocket } from 'ws';
 import { IncomingMessage } from 'http';
 import { verifyToken } from './auth';
 import { getAllTools, executeTool } from '../mcp-server/tools';
-import { getAllResources } from '../mcp-server/resources';
+import { getAllResources, initializeResources } from '../mcp-server/resources';
 import { getResourceContent } from '../mcp-server/resources/content';
+
+// Import tools to register them
+import '../mcp-server/tools/weather';
+import '../mcp-server/tools/filesystem';
+import '../mcp-server/tools/search';
+import '../mcp-server/tools/database';
+
+// Initialize resources
+initializeResources();
+
+// Register basic tools
+import { registerTool } from '../mcp-server/tools/index';
+
+registerTool({
+  name: 'echo',
+  description: 'Echo back a message',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      message: {
+        type: 'string',
+        description: 'The message to echo back',
+      },
+    },
+  },
+  handler: async (args: Record<string, any>) => ({
+    content: [
+      {
+        type: 'text',
+        text: `Echo: ${args.message || 'Hello from MCP!'}`,
+      },
+    ],
+  }),
+});
+
+registerTool({
+  name: 'get_time',
+  description: 'Get the current time',
+  inputSchema: {
+    type: 'object',
+    properties: {},
+  },
+  handler: async () => ({
+    content: [
+      {
+        type: 'text',
+        text: `Current time: ${new Date().toISOString()}`,
+      },
+    ],
+  }),
+});
 
 export interface MCPWebSocketMessage {
   id: string;

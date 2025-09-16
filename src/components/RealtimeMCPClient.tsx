@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useWebSocket } from '../hooks/useWebSocket';
-import { getAllTools } from '../mcp-server/tools';
-import { getAllResources } from '../mcp-server/resources';
 
 interface ToolExecution {
   id: string;
@@ -34,21 +32,38 @@ export default function RealtimeMCPClient() {
   const [resources, setResources] = useState<any[]>([]);
   const [tools, setTools] = useState<any[]>([]);
 
-  // Load tools and resources on mount
+  // Load tools and resources via WebSocket when connected
   useEffect(() => {
     const loadData = async () => {
+      if (!isConnected) return;
+
       try {
-        const toolsData = getAllTools();
-        const resourcesData = getAllResources();
-        setTools(toolsData);
-        setResources(resourcesData);
+        // Fetch tools via WebSocket
+        const toolsResponse = await sendMessage({
+          type: 'mcp_request',
+          method: 'tools/list',
+        });
+
+        if (toolsResponse.result?.tools) {
+          setTools(toolsResponse.result.tools);
+        }
+
+        // Fetch resources via WebSocket
+        const resourcesResponse = await sendMessage({
+          type: 'mcp_request',
+          method: 'resources/list',
+        });
+
+        if (resourcesResponse.result?.resources) {
+          setResources(resourcesResponse.result.resources);
+        }
       } catch (error) {
         console.error('Error loading tools and resources:', error);
       }
     };
 
     loadData();
-  }, []);
+  }, [isConnected, sendMessage]);
 
   const getToolArguments = (toolName: string) => {
     const tool = tools.find(t => t.name === toolName);
