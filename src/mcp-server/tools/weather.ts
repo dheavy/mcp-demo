@@ -76,7 +76,7 @@ async function getWeatherData(location: string): Promise<WeatherData> {
 
 // Weather tool handler.
 async function weatherHandler(
-  args: Record<string, any>
+  args: Record<string, unknown>
 ): Promise<MCPToolResult> {
   const { location } = args;
 

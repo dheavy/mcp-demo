@@ -115,7 +115,7 @@ registerTool({
       },
     },
   },
-  handler: async (args: Record<string, any>) => ({
+  handler: async (args: Record<string, unknown>) => ({
     content: [
       {
         type: 'text',

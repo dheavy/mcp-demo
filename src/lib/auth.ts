@@ -53,15 +53,15 @@ export function generateToken(user: User): string {
 
 export function verifyToken(token: string): User | null {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    const decoded = jwt.verify(token, JWT_SECRET) as Record<string, unknown>;
     return {
-      id: decoded.id,
-      username: decoded.username,
-      email: decoded.email,
-      role: decoded.role,
-      created_at: decoded.created_at || new Date().toISOString(),
+      id: Number(decoded.id),
+      username: String(decoded.username),
+      email: String(decoded.email),
+      role: decoded.role as 'admin' | 'user',
+      created_at: String(decoded.created_at || new Date().toISOString()),
     };
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -138,7 +138,8 @@ export async function loginUser(
     }
 
     // Remove password hash from user object
-    const { password_hash, ...userWithoutPassword } = user;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password_hash: _, ...userWithoutPassword } = user;
 
     // Generate token
     const token = generateToken(userWithoutPassword);
@@ -161,7 +162,7 @@ export function getUserById(id: number): User | null {
       )
       .get(id) as User;
     return user || null;
-  } catch (error) {
+  } catch {
     return null;
   }
 }

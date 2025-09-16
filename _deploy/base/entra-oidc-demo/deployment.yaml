@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: entra-oidc-demo
+  labels:
+    app.kubernetes.io/component: entra-oidc-demo
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: entra-oidc-demo
+  template:
+    metadata:
+      name: entra-oidc-demo
+      labels:
+        app.kubernetes.io/component: entra-oidc-demo
+    spec:
+      serviceAccountName: entra-oidc-demo
+      containers:
+        - name: entra-oidc-demo
+          image: main.repository.ext.icrc.org/icrc/adsi/entra-oidc-demo:latest
+          imagePullPolicy: Always
+          env:
+            - name: HTTP_PROXY
+              value: http://globalproxy.gva.icrc.priv:8080
+            - name: HTTPS_PROXY
+              value: http://globalproxy.gva.icrc.priv:8080
+            - name: TENANT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: entra-oidc-demo
+                  key: TENANT_ID
+            - name: CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: entra-oidc-demo
+                  key: CLIENT_ID
+            - name: CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: entra-oidc-demo
+                  key: CLIENT_SECRET
+            - name: REDIRECT_URI
+              valueFrom:
+                secretKeyRef:
+                  name: entra-oidc-demo
+                  key: REDIRECT_URI
+            - name: POST_LOGOUT_REDIRECT_URI
+              valueFrom:
+                secretKeyRef:
+                  name: entra-oidc-demo
+                  key: POST_LOGOUT_REDIRECT_URI
+            - name: JWKS_CACHE_FILE
+              valueFrom:
+                secretKeyRef:
+                  name: entra-oidc-demo
+                  key: JWKS_CACHE_FILE
+            - name: JWKS_CACHE_TTL
+              valueFrom:
+                secretKeyRef:
+                  name: entra-oidc-demo
+                  key: JWKS_CACHE_TTL
+          ports:
+            - name: http
+              containerPort: 80
+          resources:
+            requests:
+              cpu: '50m'
+              memory: '128Mi'
+            limits:
+              cpu: '200m'
+              memory: '512Mi'
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5

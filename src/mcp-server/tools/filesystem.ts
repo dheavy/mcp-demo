@@ -17,11 +17,11 @@ function isSafePath(filePath: string): boolean {
 
 // List files in a directory.
 async function listFilesHandler(
-  args: Record<string, any>
+  args: Record<string, unknown>
 ): Promise<MCPToolResult> {
   const { directory = '.' } = args;
 
-  if (!isSafePath(directory)) {
+  if (!isSafePath(String(directory))) {
     return {
       content: [
         {
@@ -34,14 +34,14 @@ async function listFilesHandler(
   }
 
   try {
-    const fullPath = path.resolve(SAFE_DIRECTORY, directory);
+    const fullPath = path.resolve(SAFE_DIRECTORY, String(directory));
     const items = await fs.readdir(fullPath, { withFileTypes: true });
 
     const files = items
       .map(item => ({
         name: item.name,
         type: item.isDirectory() ? 'directory' : 'file',
-        path: path.join(directory, item.name),
+        path: path.join(String(directory), item.name),
       }))
       .sort((a, b) => {
         // Directories first, then files.
@@ -91,7 +91,7 @@ async function listFilesHandler(
 
 // Read a file
 async function readFileHandler(
-  args: Record<string, any>
+  args: Record<string, unknown>
 ): Promise<MCPToolResult> {
   const { filepath } = args;
 

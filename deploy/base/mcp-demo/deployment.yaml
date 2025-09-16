@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-demo
+  labels:
+    app.kubernetes.io/component: mcp-demo
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: mcp-demo
+  template:
+    metadata:
+      name: mcp-demo
+      labels:
+        app.kubernetes.io/component: mcp-demo
+    spec:
+      serviceAccountName: mcp-demo
+      containers:
+        - name: mcp-demo
+          image: main.repository.ext.icrc.org/icrc/adsi/mcp-demo:latest
+          imagePullPolicy: Always
+          env:
+            - name: HTTP_PROXY
+              value: http://globalproxy.gva.icrc.priv:8080
+            - name: HTTPS_PROXY
+              value: http://globalproxy.gva.icrc.priv:8080
+            - name: NODE_ENV
+              value: production
+            - name: PORT
+              value: "3000"
+            - name: HOSTNAME
+              value: "0.0.0.0"
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: mcp-demo
+                  key: JWT_SECRET
+          ports:
+            - name: http
+              containerPort: 3000
+          resources:
+            requests:
+              cpu: '50m'
+              memory: '128Mi'
+            limits:
+              cpu: '200m'
+              memory: '512Mi'
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5

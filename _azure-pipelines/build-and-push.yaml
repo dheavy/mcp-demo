@@ -1,0 +1,49 @@
+---
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: DevOps Portal/pipelines-templates
+      ref: refs/heads/main
+    - repository: self
+      type: git
+      ref: refs/heads/main
+
+name: build-and-push-$(date:yyyyMMdd)$(rev:.rr)
+
+trigger:
+  branches:
+    include:
+      - main
+      - feat/prep-for-deploy
+
+pool:
+  name: OpenShift
+
+stages:
+  - stage: buildAndPush
+    displayName: Build and push Entra OIDC Demo container image
+    jobs:
+      - job: buildAndPush
+        displayName: Build container and push job
+        steps:
+          - task: Docker@2
+            displayName: Login to Nexus
+            inputs:
+              command: login
+              containerRegistry: icrc-repository-main-images
+          - task: Docker@2
+            displayName: Build and push container
+            inputs:
+              containerRegistry: icrc-repository-main-images
+              command: buildAndPush
+              Dockerfile: ./Dockerfile
+              repository: icrc/adsi/entra-oidc-demo
+              tags: latest
+          - task: PowerShell@2
+            displayName: Trigger "Deploy Test" pipeline
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Build and push completed successfully. Deploy-test pipeline will be triggered automatically."
+                Write-Host "Pipeline dependencies are configured to trigger deploy-test after build-and-push completion."

@@ -5,8 +5,8 @@ export interface MCPWebSocketMessage {
   id: string;
   type: 'mcp_request' | 'mcp_response' | 'error' | 'ping' | 'pong';
   method?: string;
-  params?: any;
-  result?: any;
+  params?: Record<string, unknown>;
+  result?: unknown;
   error?: string;
 }
 

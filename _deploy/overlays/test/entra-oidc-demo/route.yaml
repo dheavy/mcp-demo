@@ -1,0 +1,6 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: entra-oidc-demo
+spec:
+  host: sso-poc-test.apps.ikstest.gva.icrc.priv

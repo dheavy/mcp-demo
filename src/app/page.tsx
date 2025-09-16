@@ -10,7 +10,7 @@ interface MCPResponse {
   content: Array<{
     type: string;
     text?: string;
-    data?: any;
+    data?: unknown;
   }>;
   isError?: boolean;
 }
@@ -60,7 +60,7 @@ export default function Home() {
       setServerStatus(
         `✅ Server running - ${data.config.toolsCount} tools available`
       );
-    } catch (error) {
+    } catch {
       setServerStatus('❌ Server not responding');
     }
   };
@@ -104,7 +104,7 @@ export default function Home() {
   const getToolArguments = (
     toolName: string,
     input: string
-  ): Record<string, any> => {
+  ): Record<string, unknown> => {
     switch (toolName) {
       case 'echo':
         return { message: input };

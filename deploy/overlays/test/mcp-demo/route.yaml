@@ -1,0 +1,16 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: mcp-demo
+  labels:
+    app.kubernetes.io/component: mcp-demo
+spec:
+  host: mcp-demo-test.apps.ikstest.gva.icrc.priv
+  to:
+    kind: Service
+    name: mcp-demo
+  port:
+    targetPort: http
+  tls:
+    insecureEdgeTerminationPolicy: None
+    termination: edge

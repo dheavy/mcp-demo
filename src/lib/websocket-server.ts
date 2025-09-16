@@ -29,7 +29,7 @@ registerTool({
       },
     },
   },
-  handler: async (args: Record<string, any>) => ({
+  handler: async (args: Record<string, unknown>) => ({
     content: [
       {
         type: 'text',
@@ -60,8 +60,8 @@ export interface MCPWebSocketMessage {
   id: string;
   type: 'mcp_request' | 'mcp_response' | 'error' | 'ping' | 'pong';
   method?: string;
-  params?: any;
-  result?: any;
+  params?: Record<string, unknown>;
+  result?: unknown;
   error?: string;
 }
 
@@ -74,13 +74,13 @@ export class MCPWebSocketServer {
   private wss: WebSocketServer | null = null;
   private clients: Map<string, AuthenticatedWebSocket> = new Map();
 
-  public setup(server: any) {
+  public setup(server: unknown) {
     if (this.wss) {
       return this.wss;
     }
 
     this.wss = new WebSocketServer({
-      server,
+      server: server as any, // eslint-disable-line @typescript-eslint/no-explicit-any
       path: '/ws/mcp',
     });
 
@@ -233,7 +233,7 @@ export class MCPWebSocketServer {
     const { id, method, params } = message;
 
     try {
-      let result: any;
+      let result: unknown;
 
       switch (method) {
         case 'tools/list':
@@ -245,7 +245,7 @@ export class MCPWebSocketServer {
           break;
 
         case 'resources/read':
-          if (!params?.uri) {
+          if (!params?.uri || typeof params.uri !== 'string') {
             throw new Error('Resource URI is required');
           }
           const content = await getResourceContent(params.uri);
@@ -253,12 +253,12 @@ export class MCPWebSocketServer {
           break;
 
         case 'tools/call':
-          if (!params?.name) {
+          if (!params?.name || typeof params.name !== 'string') {
             throw new Error('Tool name is required');
           }
           const toolResult = await executeTool(
             params.name,
-            params.arguments || {}
+            (params.arguments as Record<string, unknown>) || {}
           );
           result = {
             content: toolResult.content,
@@ -289,10 +289,10 @@ export class MCPWebSocketServer {
   }
 
   // Broadcast message to all connected clients.
-  public broadcast(message: any, excludeUserId?: string) {
+  public broadcast(message: unknown, excludeUserId?: string) {
     const messageStr = JSON.stringify(message);
 
-    for (const [clientId, client] of this.clients.entries()) {
+    for (const [, client] of this.clients.entries()) {
       if (
         client.readyState === WebSocket.OPEN &&
         client.userId !== excludeUserId
@@ -303,10 +303,10 @@ export class MCPWebSocketServer {
   }
 
   // Send message to specific user.
-  public sendToUser(userId: string, message: any) {
+  public sendToUser(userId: string, message: unknown) {
     const messageStr = JSON.stringify(message);
 
-    for (const [clientId, client] of this.clients.entries()) {
+    for (const [, client] of this.clients.entries()) {
       if (client.readyState === WebSocket.OPEN && client.userId === userId) {
         client.send(messageStr);
       }

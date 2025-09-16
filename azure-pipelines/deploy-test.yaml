@@ -1,0 +1,85 @@
+---
+resources:
+  pipelines:
+    - pipeline: buildAndPush
+      # Triggered by the build-and-push pipeline
+      source: adsi-mcp-demo-build-and-push
+      trigger:
+        branches:
+          include:
+            - main
+            - feat/prep-for-deploy
+  repositories:
+    - repository: templates
+      type: git
+      name: DevOps Portal/pipelines-templates
+      ref: refs/heads/main
+    - repository: self
+      type: git
+      ref: refs/heads/main
+
+# This pipeline only runs after build-and-push (no trigger).
+trigger: none
+pr: none
+
+name: deploy-test-$(date:yyyyMMdd)$(rev:.rr)
+
+variables:
+  - group: mcp-demo-secrets-test
+
+stages:
+  - stage: createSecrets
+    displayName: Create Kubernetes secrets
+    dependsOn: []
+    condition: succeeded()
+    jobs:
+      - job: createSecrets
+        displayName: Create Kubernetes secrets
+        pool:
+          name: OpenShift
+        steps:
+          - task: Kubernetes@1
+            displayName: Delete existing Kubernetes secret (if exists)
+            inputs:
+              connectionType: 'Kubernetes Service Connection'
+              kubernetesServiceEndpoint: 'api.ikstest.gva.icrc.priv_labwam-test'
+              namespace: 'labwam-test'
+              command: 'delete'
+              arguments: 'secret mcp-demo --ignore-not-found=true'
+
+          - task: Kubernetes@1
+            displayName: Create Kubernetes secrets from Variable Group
+            inputs:
+              connectionType: 'Kubernetes Service Connection'
+              kubernetesServiceEndpoint: 'api.ikstest.gva.icrc.priv_labwam-test'
+              namespace: 'labwam-test'
+              command: 'create'
+              arguments: 'secret generic mcp-demo --from-literal=JWT_SECRET="$(JWT_SECRET)"'
+
+  - stage: deployInTest
+    displayName: Deploy in Test environment
+    dependsOn: createSecrets
+    condition: succeeded()
+    jobs:
+      - job: deployToK8s
+        displayName: Deploy to Kubernetes
+        pool:
+          name: OpenShift
+        steps:
+          - task: Kubernetes@1
+            displayName: Create Service Account
+            inputs:
+              connectionType: 'Kubernetes Service Connection'
+              kubernetesServiceEndpoint: 'api.ikstest.gva.icrc.priv_labwam-test'
+              namespace: 'labwam-test'
+              command: 'apply'
+              arguments: '-f deploy/base/common/service-account.yaml'
+
+          - task: Kubernetes@1
+            displayName: Apply Kustomize deployment
+            inputs:
+              connectionType: 'Kubernetes Service Connection'
+              kubernetesServiceEndpoint: 'api.ikstest.gva.icrc.priv_labwam-test'
+              namespace: 'labwam-test'
+              command: 'apply'
+              arguments: '-k deploy/overlays/test'

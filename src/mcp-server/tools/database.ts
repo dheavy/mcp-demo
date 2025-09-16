@@ -6,7 +6,9 @@ import { registerTool } from './index';
 import { getDatabase } from '../../lib/database';
 
 // Execute SQL query tool handler.
-async function queryHandler(args: Record<string, any>): Promise<MCPToolResult> {
+async function queryHandler(
+  args: Record<string, unknown>
+): Promise<MCPToolResult> {
   const { sql } = args;
 
   if (!sql || typeof sql !== 'string') {
@@ -54,11 +56,12 @@ async function queryHandler(args: Record<string, any>): Promise<MCPToolResult> {
     }
 
     // Format results as a table.
-    const columns = Object.keys(results[0]);
+    const columns = Object.keys(results[0] as Record<string, unknown>);
     const header = columns.join(' | ');
     const separator = columns.map(() => '---').join(' | ');
-    const rows = results.map((row: Record<string, any>) =>
-      columns.map(col => String(row[col] || 'NULL')).join(' | ')
+    const rows = (results as Record<string, unknown>[]).map(
+      (row: Record<string, unknown>) =>
+        columns.map(col => String(row[col] || 'NULL')).join(' | ')
     );
 
     const table = [header, separator, ...rows].join('\n');
@@ -87,7 +90,8 @@ async function queryHandler(args: Record<string, any>): Promise<MCPToolResult> {
 }
 
 async function schemaHandler(
-  args: Record<string, any>
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _: Record<string, unknown>
 ): Promise<MCPToolResult> {
   try {
     const db = getDatabase();
@@ -124,7 +128,7 @@ async function schemaHandler(
         name: string;
         type: string;
         notnull: number;
-        dflt_value: any;
+        dflt_value: unknown;
         pk: number;
       }>;
 
@@ -165,7 +169,8 @@ async function schemaHandler(
 
 // Get sample queries tool handler
 async function samplesHandler(
-  args: Record<string, any>
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _: Record<string, unknown>
 ): Promise<MCPToolResult> {
   const sampleQueries = [
     {

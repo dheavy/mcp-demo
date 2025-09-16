@@ -1,0 +1,15 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: entra-oidc-demo
+  labels:
+    app.kubernetes.io/component: entra-oidc-demo
+spec:
+  to:
+    kind: Service
+    name: entra-oidc-demo
+  port:
+    targetPort: http
+  tls:
+    insecureEdgeTerminationPolicy: None
+    termination: edge

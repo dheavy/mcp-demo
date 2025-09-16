@@ -7,7 +7,7 @@ export interface ToolHandler {
   name: string;
   description: string;
   inputSchema: MCPTool['inputSchema'];
-  handler: (args: Record<string, any>) => Promise<MCPToolResult>;
+  handler: (args: Record<string, unknown>) => Promise<MCPToolResult>;
 }
 
 // Tool registry.
@@ -27,7 +27,7 @@ export function getAllTools(): MCPTool[] {
 
 export async function executeTool(
   name: string,
-  args: Record<string, any>
+  args: Record<string, unknown>
 ): Promise<MCPToolResult> {
   const tool = tools.get(name);
   if (!tool) {

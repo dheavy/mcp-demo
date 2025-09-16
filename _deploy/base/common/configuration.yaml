@@ -1,0 +1,9 @@
+nameReference:
+  - kind: Service
+    fieldSpecs:
+      - kind: Route
+        path: spec/to/name
+  - kind: Route
+    fieldSpecs:
+      - kind: F5Publishing
+        path: spec/route_name
