@@ -3,7 +3,7 @@ export interface MCPTool {
   description: string;
   inputSchema: {
     type: string;
-    properties: Record<string, any>;
+    properties: Record<string, unknown>;
     required?: string[];
   };
 }
@@ -17,14 +17,14 @@ export interface MCPResource {
 
 export interface MCPToolCall {
   name: string;
-  arguments: Record<string, any>;
+  arguments: Record<string, unknown>;
 }
 
 export interface MCPToolResult {
   content: Array<{
     type: string;
     text?: string;
-    data?: any;
+    data?: unknown;
   }>;
   isError?: boolean;
 }

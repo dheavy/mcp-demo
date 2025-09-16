@@ -6,9 +6,9 @@ import { useWebSocket } from '../hooks/useWebSocket';
 interface ToolExecution {
   id: string;
   toolName: string;
-  arguments: any;
+  arguments: Record<string, unknown>;
   status: 'pending' | 'executing' | 'completed' | 'error';
-  result?: any;
+  result?: unknown;
   error?: string;
   timestamp: number;
 }
@@ -17,7 +17,7 @@ interface ResourceRead {
   id: string;
   uri: string;
   status: 'pending' | 'reading' | 'completed' | 'error';
-  content?: any;
+  content?: unknown;
   error?: string;
   timestamp: number;
 }
@@ -25,12 +25,15 @@ interface ResourceRead {
 export default function RealtimeMCPClient() {
   const { isConnected, isConnecting, error, sendMessage } = useWebSocket();
   const [selectedTool, setSelectedTool] = useState<string>('');
-  const [toolArguments, setToolArguments] = useState<Record<string, any>>({});
+  const [toolArguments, setToolArguments] = useState<Record<string, unknown>>(
+    {}
+  );
   const [executions, setExecutions] = useState<ToolExecution[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedResource, setSelectedResource] = useState<string>('');
   const [resourceReads, setResourceReads] = useState<ResourceRead[]>([]);
-  const [resources, setResources] = useState<any[]>([]);
-  const [tools, setTools] = useState<any[]>([]);
+  const [resources, setResources] = useState<unknown[]>([]);
+  const [tools, setTools] = useState<unknown[]>([]);
 
   // Load tools and resources via WebSocket when connected
   useEffect(() => {
@@ -44,8 +47,12 @@ export default function RealtimeMCPClient() {
           method: 'tools/list',
         });
 
-        if (toolsResponse.result?.tools) {
-          setTools(toolsResponse.result.tools);
+        if (
+          toolsResponse.result &&
+          typeof toolsResponse.result === 'object' &&
+          'tools' in toolsResponse.result
+        ) {
+          setTools((toolsResponse.result as { tools: unknown[] }).tools);
         }
 
         // Fetch resources via WebSocket
@@ -54,8 +61,14 @@ export default function RealtimeMCPClient() {
           method: 'resources/list',
         });
 
-        if (resourcesResponse.result?.resources) {
-          setResources(resourcesResponse.result.resources);
+        if (
+          resourcesResponse.result &&
+          typeof resourcesResponse.result === 'object' &&
+          'resources' in resourcesResponse.result
+        ) {
+          setResources(
+            (resourcesResponse.result as { resources: unknown[] }).resources
+          );
         }
       } catch (error) {
         console.error('Error loading tools and resources:', error);
@@ -66,23 +79,36 @@ export default function RealtimeMCPClient() {
   }, [isConnected, sendMessage]);
 
   const getToolArguments = (toolName: string) => {
-    const tool = tools.find(t => t.name === toolName);
+    const tool = tools.find(
+      t =>
+        typeof t === 'object' &&
+        t !== null &&
+        'name' in t &&
+        (t as { name: string }).name === toolName
+    ) as
+      | { name: string; inputSchema?: { properties?: Record<string, unknown> } }
+      | undefined;
     if (!tool) return {};
 
-    const args: Record<string, any> = {};
+    const args: Record<string, unknown> = {};
     if (tool.inputSchema?.properties) {
       Object.entries(tool.inputSchema.properties).forEach(
-        ([key, prop]: [string, any]) => {
-          if (prop.type === 'string') {
-            args[key] = prop.default || '';
-          } else if (prop.type === 'number') {
-            args[key] = prop.default || 0;
-          } else if (prop.type === 'boolean') {
-            args[key] = prop.default || false;
-          } else if (prop.type === 'array') {
-            args[key] = prop.default || [];
+        ([key, prop]: [string, unknown]) => {
+          if (typeof prop === 'object' && prop !== null && 'type' in prop) {
+            const typedProp = prop as { type: string; default?: unknown };
+            if (typedProp.type === 'string') {
+              args[key] = typedProp.default || '';
+            } else if (typedProp.type === 'number') {
+              args[key] = typedProp.default || 0;
+            } else if (typedProp.type === 'boolean') {
+              args[key] = typedProp.default || false;
+            } else if (typedProp.type === 'array') {
+              args[key] = typedProp.default || [];
+            } else {
+              args[key] = typedProp.default || '';
+            }
           } else {
-            args[key] = prop.default || '';
+            args[key] = '';
           }
         }
       );
@@ -278,24 +304,35 @@ export default function RealtimeMCPClient() {
             Available Tools ({tools.length})
           </h3>
           <div className="space-y-2">
-            {tools.map(tool => (
-              <button
-                key={tool.name}
-                onClick={() => handleToolSelect(tool.name)}
-                className={`w-full text-left p-3 rounded-lg border transition-colors ${
-                  selectedTool === tool.name
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                    : 'border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
-                }`}
-              >
-                <div className="font-medium text-gray-900 dark:text-white">
-                  {tool.name}
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">
-                  {tool.description}
-                </div>
-              </button>
-            ))}
+            {tools.map(tool => {
+              if (
+                typeof tool === 'object' &&
+                tool !== null &&
+                'name' in tool &&
+                'description' in tool
+              ) {
+                const typedTool = tool as { name: string; description: string };
+                return (
+                  <button
+                    key={typedTool.name}
+                    onClick={() => handleToolSelect(typedTool.name)}
+                    className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                      selectedTool === typedTool.name
+                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                        : 'border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    <div className="font-medium text-gray-900 dark:text-white">
+                      {typedTool.name}
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300">
+                      {typedTool.description}
+                    </div>
+                  </button>
+                );
+              }
+              return null;
+            })}
           </div>
 
           {selectedTool && (
@@ -311,7 +348,7 @@ export default function RealtimeMCPClient() {
                     </label>
                     <input
                       type="text"
-                      value={value}
+                      value={String(value)}
                       onChange={e =>
                         setToolArguments(prev => ({
                           ...prev,
@@ -365,7 +402,7 @@ export default function RealtimeMCPClient() {
                   <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                     {new Date(execution.timestamp).toLocaleTimeString()}
                   </div>
-                  {execution.result && (
+                  {execution.result !== undefined && (
                     <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-700 rounded text-sm">
                       <pre className="whitespace-pre-wrap text-gray-800 dark:text-gray-200">
                         {JSON.stringify(execution.result, null, 2)}
@@ -389,26 +426,42 @@ export default function RealtimeMCPClient() {
             Available Resources ({resources.length})
           </h3>
           <div className="space-y-2 max-h-96 overflow-y-auto">
-            {resources.map(resource => (
-              <div
-                key={resource.uri}
-                className="border border-gray-200 dark:border-gray-600 rounded-lg p-3"
-              >
-                <div className="font-medium text-gray-900 dark:text-white mb-1">
-                  {resource.name}
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-300 mb-2">
-                  {resource.description}
-                </div>
-                <button
-                  onClick={() => readResource(resource.uri)}
-                  disabled={!isConnected}
-                  className="w-full bg-green-600 text-white py-1 px-3 rounded text-sm hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                >
-                  Read Resource
-                </button>
-              </div>
-            ))}
+            {resources.map(resource => {
+              if (
+                typeof resource === 'object' &&
+                resource !== null &&
+                'uri' in resource &&
+                'name' in resource &&
+                'description' in resource
+              ) {
+                const typedResource = resource as {
+                  uri: string;
+                  name: string;
+                  description: string;
+                };
+                return (
+                  <div
+                    key={typedResource.uri}
+                    className="border border-gray-200 dark:border-gray-600 rounded-lg p-3"
+                  >
+                    <div className="font-medium text-gray-900 dark:text-white mb-1">
+                      {typedResource.name}
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                      {typedResource.description}
+                    </div>
+                    <button
+                      onClick={() => readResource(typedResource.uri)}
+                      disabled={!isConnected}
+                      className="w-full bg-green-600 text-white py-1 px-3 rounded text-sm hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    >
+                      Read Resource
+                    </button>
+                  </div>
+                );
+              }
+              return null;
+            })}
           </div>
 
           {/* Resource Read Results */}
@@ -435,7 +488,7 @@ export default function RealtimeMCPClient() {
                         {getStatusIcon(read.status)} {read.status}
                       </span>
                     </div>
-                    {read.content && (
+                    {read.content !== undefined && (
                       <div className="mt-1 p-1 bg-gray-50 dark:bg-gray-700 rounded text-xs">
                         <pre className="whitespace-pre-wrap text-gray-800 dark:text-gray-200 max-h-20 overflow-y-auto">
                           {JSON.stringify(read.content, null, 2)}

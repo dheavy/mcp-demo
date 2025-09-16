@@ -1,7 +1,7 @@
 /**
  * Resource Content Provider.
  */
-import { MCPResource } from '../types';
+// import { MCPResource } from '../types';
 import { getAllResources } from './index';
 
 // Get content for a specific resource

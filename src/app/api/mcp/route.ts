@@ -16,7 +16,7 @@ export async function GET() {
         resourcesCount: getResourceCount(),
       },
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to get MCP server status' },
       { status: 500 }
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
               },
             ],
           });
-        } catch (error) {
+        } catch {
           return NextResponse.json(
             { error: `Resource not found: ${params.uri}` },
             { status: 404 }
@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
     }
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to process MCP request' },
       { status: 500 }

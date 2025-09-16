@@ -89,7 +89,7 @@ function generateMockResults(query: string): SearchResult[] {
 
 // Web search tool handler.
 async function searchHandler(
-  args: Record<string, any>
+  args: Record<string, unknown>
 ): Promise<MCPToolResult> {
   const { query, limit = 5 } = args;
 
@@ -131,7 +131,7 @@ async function searchHandler(
     }
 
     // Limit results
-    const limitedResults = results.slice(0, Math.min(limit, 10));
+    const limitedResults = results.slice(0, Math.min(Number(limit), 10));
 
     // Format results
     const formattedResults = limitedResults
